@@ -60,7 +60,7 @@ def non_max_suppression(predictions_with_boxes, confidence_threshold, iou_thresh
     ----------
     predictions_with_boxes : ndarray
         An array of shape:
-        [1, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 5]
+        [1, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 6]
         where num_x_obj_detectors = num_anchors_per_layer * yolo_layer_grid_w * yolo_layer_grid_h.
     confidence_threshold : float
         A number between zero and one which indicates the minimum object confidence prediction necessary

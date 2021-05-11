@@ -15,17 +15,17 @@ def yolo_v3_loss(yolo_outputs, y_true, y_true_boxes, ignore_threshold, anchors, 
         [large_object_box_detections, medium_object_box_detections, small_object_box_detections, 
         large_object_raw_detections, medium_object_raw_detections, small_object_raw_detections] 
         The elements of the list will be tensors of shape:
-        [batch_size, yolo_layer_grid_h * yolo_layer_grid_w * num_anchors_per_layer, num_classes + 5]
+        [batch_size, yolo_layer_grid_h * yolo_layer_grid_w * num_anchors_per_layer, num_classes + 6]
     y_true : tensor
         A tensor containing the ground truth box coordinate and class information used for training 
         and calculating the loss of the yolo_v3 model. 
         A sample y_true tensor would be of shape:
-        [batch_size, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 5]
+        [batch_size, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 6]
         where num_x_obj_detectors = num_anchors_per_layer * yolo_layer_grid_w * yolo_layer_grid_h.
         The heights and widths of the yolo layers will vary depending on if the layer is meant to detect
         large, medium, or small objects. The large, medium, and small y_true data is extracted from this tensor
         and then eventually reshaped to be in the more standard form of:
-        [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 5 + num_classes]
+        [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 6 + num_classes]
         y_true needs to be in its initial shape so that its values can easily be passed into a 
         placeholder variable in the feed dictionary. 
     y_true_boxes : tensor
@@ -74,14 +74,14 @@ def yolo_v3_loss(yolo_outputs, y_true, y_true_boxes, ignore_threshold, anchors, 
             'center_x, center_y, width, height'. If an input image is of the shape (416, 416), then
             a sample predicted box may have coordinates of (100,80,40,53).
             A sample yolo layer output will be a tensor of the shape:
-            [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 5 + num_classes] 
-            The '5' represents the x_coord, y_coord, width_value, height_value, and obj_confidence_score.
+            [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 6 + num_classes] 
+            The '6' represents the x_coord, y_coord, width_value, height_value, theta, and obj_confidence_score.
             The yolo layer output is needed to calculate the IOU between the predicted boxes and the 
             true boxes.
         conv_layer_outputs : tensor
             The outputs of a convolutional layer, right before they are fed into a yolo layer.
             The convolutional layer will be a tensor of shape:
-            [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer * (5 + num_classes)]
+            [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer * (6 + num_classes)]
             The convolutional layer outputs are raw predictions which have not been passed
             through the logarithmic nor exponential functions necessary to predict 
             fully scaled bounding boxes. The outputs of the convolutional layer are needed to calculate 
@@ -90,10 +90,10 @@ def yolo_v3_loss(yolo_outputs, y_true, y_true_boxes, ignore_threshold, anchors, 
             The ground truth tensor which contains the theoretical ideal output of a 
             corresponding yolo layer. 
             A sample y_true tensor will be of shape:
-            [batch_size, yolo_layer_grid_h * yolo_layer_grid_w * num_anchors_per_layer, 5 + num_classes]
+            [batch_size, yolo_layer_grid_h * yolo_layer_grid_w * num_anchors_per_layer, 6 + num_classes]
             which will then be reshaped into the shape of:
-            [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 5 + num_classes]
-            The '5' represents the x_coord, y_coord, width_value, height_value, and obj_confidence_score.
+            [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 6 + num_classes]
+            The '6' represents the x_coord, y_coord, width_value, height_value, theta, and obj_confidence_score.
             The coordinates of the boxes in y_true are stored in terms of 'center_x', 'center_y',
             'width', and 'height', and their values are percentages of the original input image size.
             In the case of y_true, the value at the obj_confidence_score index will always be 1 at the
