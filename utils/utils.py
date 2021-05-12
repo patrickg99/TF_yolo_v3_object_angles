@@ -164,7 +164,7 @@ def convert_box_coordinates(detections):
     ----------
     detections : ndarray
         An array of shape:
-        [1, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 5]
+        [1, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 6]
         where num_x_obj_detectors = num_anchors_per_layer * yolo_layer_grid_w * yolo_layer_grid_h. 
 
     Returns
@@ -284,11 +284,11 @@ def prepare_data(annotations_path, training_validation_split=0.9, batch_size=32,
         The path which points to the text file with image and box data.
         The file structures data in the following way:
 
-        image_data/images/img1.jpg 50,100,150,200,0 30,50,200,120,3
-        image_data/images/img2.jpg 20,100,123,157,70 30,77,200,120,21 44,50,60,60,2
+        image_data/images/img1.jpg 50,100,150,200,.7,0 30,50,200,120,.5,3
+        image_data/images/img2.jpg 20,100,123,157,.3,70 30,77,200,120,.4,21 44,50,60,60,.6,2
 
         Or to put it in more abstract terms:
-        path/to/first/training/image min_x,min_y,max_x,max_y,class_num, etc..
+        path/to/first/training/image min_x,min_y,max_x,max_y,theta,class_num, etc..
         (up to max_num_boxes_per_image of boxes per image)
     training_validation_split : float
         The percentage of the data that should be kept for training 
@@ -342,7 +342,7 @@ def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitt
     Parameters
     ----------
     annotation_line : list
-        a list in the format of ['path/to/img1.jpg', '50,50,150,200,0', '10,70,200,120,3']
+        a list in the format of ['path/to/img1.jpg', '50,50,150,200,.6,0', '10,70,200,120,.5,3']
     input_shape : tuple
         The height and the width of the yolov3 input shape.
     random : bool
@@ -367,9 +367,9 @@ def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitt
     image_data : ndarray
         Array of shape [w, h, 3] containing the image data. Inputs are divided by 255.0.
     box_data : ndarray
-        Array of shape [max_boxes, 5] 
-        where the '5' represents the min x coordinate, min y coordinate, max x coordinate, 
-        max y coordinate, and the box's class number. The box coordinates are fully scaled numbers
+        Array of shape [max_boxes, 6] 
+        where the '6' represents the min x coordinate, min y coordinate, max x coordinate, 
+        max y coordinate, theta, and the box's class number. The box coordinates are fully scaled numbers
         relative to the original image size. If there are are not enough boxes to fit up the
         box_data tensor (for example: the image only contains 5 boxes but the max number of boxes
         per image is 20), then the empty entries are simply filled with zeros.
@@ -397,7 +397,7 @@ def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitt
             image_data = np.array(new_image)/255.
 
         # correct boxes
-        box_data = np.zeros((max_boxes,5))
+        box_data = np.zeros((max_boxes,6))
         if len(box)>0:
             np.random.shuffle(box)
             if len(box)>max_boxes: box = box[:max_boxes]
@@ -459,7 +459,7 @@ def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitt
     image_data = cv2.cvtColor(x.astype(np.float32), cv2.COLOR_HSV2RGB) 
 
     # correct boxes
-    box_data = np.zeros((max_boxes,5))
+    box_data = np.zeros((max_boxes,6))
     if len(box)>0:
         np.random.shuffle(box)
         box[:, [0,2]] = box[:, [0,2]]*nw/iw + dx
@@ -485,9 +485,9 @@ def create_y_true(box_data, anchors, num_classes, h=416, w=416):
         ----------
         box_data : ndarray
             A numpy array of shape:
-            [batch_size, max_num_true_boxes_per_image, 5]
-            where the '5' represents the min x coordinate, min y coordinate, max x coordinate, 
-            max y coordinate, and the box's class number. The box coordinates are fully scaled numbers
+            [batch_size, max_num_true_boxes_per_image, 6]
+            where the '6' represents the min x coordinate, min y coordinate, max x coordinate, 
+            max y coordinate, theta, and the box's class number. The box coordinates are fully scaled numbers
             relative to the original image size.
         anchors : list
             A list of anchors with format:
@@ -508,8 +508,8 @@ def create_y_true(box_data, anchors, num_classes, h=416, w=416):
         -------
         y_true : ndarray
             The complete y_true array of shape:
-            [batch_size, num_large_obj_detectors + num_medium_obj_detectors + num_small_obj_detectors, 5 + num_classes]
-            where the '5' represents the center_x, center_y, width, height coordinates all as percentages of the
+            [batch_size, num_large_obj_detectors + num_medium_obj_detectors + num_small_obj_detectors, 6 + num_classes]
+            where the '6' represents the center_x, center_y, width, height, theta, and obj_confidence_score. coordinates all as percentages of the
             original image size. 
             num_x_obj_detectors = num_anchors_per_layer * x_grid_height * x_grid_width
             The y_true numpy array is shaped like this for easy loading into the feed dictionary.
@@ -531,9 +531,9 @@ def create_y_true(box_data, anchors, num_classes, h=416, w=416):
             ----------
             box_data : ndarray
                 A numpy array of shape:
-                [batch_size, max_num_true_boxes_per_image, 5]
-                where the '5' represents the center x coordinate, center y coordinate, the width,
-                the height, and the box's class number. The box coordinates are percentages of 
+                [batch_size, max_num_true_boxes_per_image, 6]
+                where the '6' represents the center x coordinate, center y coordinate, the width,
+                the height, theta, and the box's class number. The box coordinates are percentages of 
                 the original image size. 
             best_anchors : ndarray
                 index of best anchor
@@ -555,7 +555,7 @@ def create_y_true(box_data, anchors, num_classes, h=416, w=416):
             -------
             y_true : ndarray
                 A numpy array of shape:
-                [batch_size, grid_h * grid_w * num_anchors_per_layer, num_classes + 5]
+                [batch_size, grid_h * grid_w * num_anchors_per_layer, num_classes + 6]
                 This array is the y_true for a particular grid size.
             box_data : ndarray
                 A numpy array of shape:
@@ -658,8 +658,8 @@ def get_training_batch(annotation_lines, anchors, num_classes, batch_size=32, h=
     ----------
     annotation_lines : list
         A list of format
-        ['image_data/images/img1.jpg 22,748,2184,2150,2 1590,2140,1832,2414,32 2414,858,2750,2002,0', ...
-        The box data is of format min_x, min_y, max_x, max_y, class_number and is relative to the 
+        ['image_data/images/img1.jpg 22,748,2184,2150,.7,2 1590,2140,1832,2414,.8,32 2414,858,2750,2002,.5,0', ...
+        The box data is of format min_x, min_y, max_x, max_y, theta, class_number and is relative to the 
         original image size.
     anchors : list
         A list of format:
@@ -681,7 +681,7 @@ def get_training_batch(annotation_lines, anchors, num_classes, batch_size=32, h=
         An array containing the ground truth box coordinate and class information used for training 
         and calculating the loss of the yolo_v3 model. 
         A sample y_true array would be of shape:
-        [batch_size, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 5]
+        [batch_size, num_large_obj_detectors + num_med_obj_detectors + num_small_obj_detectors, num_classes + 6]
         where num_x_obj_detectors = num_anchors_per_layer * yolo_layer_grid_w * yolo_layer_grid_h.
     y_true_box_data : ndarray
         An array containing ground truth box data.
