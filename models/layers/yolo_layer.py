@@ -15,8 +15,8 @@ def yolo_layer(name, inputs, anchors, num_classes, image_height, image_width):
     inputs : tensor
         The output of the previous convolutional layer. 
         This tensor will have the shape of:
-        [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer * (5 + num_classes)]
-        where the '5' represents the boxs' coordinates and object confidence score.
+        [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer * (6 + num_classes)]
+        where the '6' represents the boxs' coordinates, theta, and object confidence score.
     anchors : list
         A sublist of the anchors list, of length num_anchors/num_layers. 
         The formatting of the sublist is as follows: 
@@ -34,7 +34,7 @@ def yolo_layer(name, inputs, anchors, num_classes, image_height, image_width):
     -------
     inputs : tensor
         A tensor of shape:
-        [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 5 + num_classes]
+        [batch_size, yolo_layer_grid_h, yolo_layer_grid_w, num_anchors_per_layer, 6 + num_classes]
         The box coordinates are of the form:
         [center_x, center_y, width, height]
         and are fully scaled up to reflect the original dimensions of the input image.
