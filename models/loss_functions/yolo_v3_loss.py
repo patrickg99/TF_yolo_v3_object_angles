@@ -277,11 +277,11 @@ def yolo_v3_loss(yolo_outputs, y_true, y_true_boxes, ignore_threshold, anchors, 
                     ignore_mask = tf.expand_dims(ignore_mask, -1)
 
                 with tf.variable_scope('no_obj_loss'):
-                    no_obj_loss = (1-obj_mask) * tf.nn.sigmoid_cross_entropy_with_logits(labels=obj_mask, logits=conv_layer_outputs[...,5]) * ignore_mask
+                    no_obj_loss = (1-obj_mask) * tf.nn.sigmoid_cross_entropy_with_logits(labels=obj_mask, logits=conv_layer_outputs[...,5:6]) * ignore_mask
                     no_obj_loss = tf.reduce_sum(no_obj_loss)
 
                 with tf.variable_scope('obj_loss'):
-                    obj_loss = obj_mask * tf.nn.sigmoid_cross_entropy_with_logits(labels=obj_mask, logits=conv_layer_outputs[...,5])
+                    obj_loss = obj_mask * tf.nn.sigmoid_cross_entropy_with_logits(labels=obj_mask, logits=conv_layer_outputs[...,5:6])
                     obj_loss = tf.reduce_sum(obj_loss)
                 
                 with tf.variable_scope('compile_pred_obj_loss'):
@@ -295,7 +295,7 @@ def yolo_v3_loss(yolo_outputs, y_true, y_true_boxes, ignore_threshold, anchors, 
                 
             with tf.variable_scope('theta_loss'):
 
-                theta_loss = obj_mask * tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[...,4], logits=conv_layer_outputs[...,4])
+                theta_loss = obj_mask * tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[...,4:5], logits=conv_layer_outputs[...,4:5])
                 theta_loss = tf.reduce_sum(theta_loss)
 
             
