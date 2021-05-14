@@ -76,7 +76,7 @@ To begin training on a custom dataset, follow these steps:
 
 1. With your open terminal cd to the repository's root directory.
 2. Make sure that the `training_data` directory is updated to include your dataset. Consult the current example setup to see how the dataset should be stored and prepared.
-3. Enter `python train.py --train_from_chekpoint=model_weights/coco_pretrained_weights.ckpt` into the terminal to begin training the model from the pretrained coco weights (recommended). You can also simply enter `python train.py` to train the model from scratch with randomly initialized weights (not recommended). 
+3. Enter `python train.py --train_from_checkpoint=model_weights/coco_pretrained_weights.ckpt` into the terminal to begin training the model from the pretrained coco weights (recommended). You can also simply enter `python train.py` to train the model from scratch with randomly initialized weights (not recommended). 
 
 Typing in `python train.py --help` will give a full rundown of the options available to you. Some of the most important options include controlling how frequently the training model logs its loss and saves its weights, whether or not you want to purposefully overfit the model onto a single image for debugging purposes, adjusting the learning rate, adjusting the number of training epochs, and adjusting the split ratio between training data and validation data.
 
