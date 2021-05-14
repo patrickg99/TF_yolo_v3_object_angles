@@ -334,7 +334,7 @@ def prepare_data(annotations_path, training_validation_split=0.9, batch_size=32,
     
     return training_data, validation_data, batch_size
 
-def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitter=0, hue=0, sat=1, val=1, proc_img=True):
+def augment_data(annotation_line, input_shape, random=False, max_boxes=20, jitter=0, hue=0, sat=1, val=1, proc_img=True):
     """
     Takes the iamge and box data and applies random transformations if the 'random' parameter is set
     to true. Otherwise, the image and box data will only be reshaped to fit the input tensor size. 
@@ -697,7 +697,7 @@ def get_training_batch(annotation_lines, anchors, num_classes, batch_size=32, h=
         if b==0:
             np.random.shuffle(annotation_lines)
         
-        image, box = augment_data(annotation_lines[b], (h, w), random=True, max_boxes=200, jitter=0, hue=0, sat=1, val=1, proc_img=True)
+        image, box = augment_data(annotation_lines[b], (h, w), random=True, max_boxes=20, jitter=0, hue=0, sat=1, val=1, proc_img=True)
         image_data.append(image)
         box_data.append(box)
 
