@@ -334,7 +334,7 @@ def prepare_data(annotations_path, training_validation_split=0.9, batch_size=32,
     
     return training_data, validation_data, batch_size
 
-def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitter=0, hue=0, sat=1, val=1, proc_img=True):
+def augment_data(annotation_line, input_shape, random=False, max_boxes=20, jitter=0, hue=0, sat=1, val=1, proc_img=True):
     """
     Takes the iamge and box data and applies random transformations if the 'random' parameter is set
     to true. Otherwise, the image and box data will only be reshaped to fit the input tensor size. 
@@ -380,7 +380,7 @@ def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitt
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     ih, iw, _ = image.shape
     h, w = input_shape
-    box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
+    box = np.array([np.array(list(map(float,box.split(',')))) for box in line[1:]])
 
     if not random:
         # resize image
@@ -401,8 +401,8 @@ def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitt
         if len(box)>0:
             np.random.shuffle(box)
             if len(box)>max_boxes: box = box[:max_boxes]
-            box[:, [0,2]] = box[:, [0,2]]*scale + dx
-            box[:, [1,3]] = box[:, [1,3]]*scale + dy
+            box[:, [0,2]] = (box[:, [0,2]]*scale + dx).astype(int)
+            box[:, [1,3]] = (box[:, [1,3]]*scale + dy).astype(int)
             box_data[:len(box)] = box
 
         return image_data, box_data
@@ -462,8 +462,8 @@ def augment_data(annotation_line, input_shape, random=False, max_boxes=200, jitt
     box_data = np.zeros((max_boxes,6))
     if len(box)>0:
         np.random.shuffle(box)
-        box[:, [0,2]] = box[:, [0,2]]*nw/iw + dx
-        box[:, [1,3]] = box[:, [1,3]]*nh/ih + dy
+        box[:, [0,2]] = (box[:, [0,2]]*nw/iw + dx).astype(int)
+        box[:, [1,3]] = (box[:, [1,3]]*nh/ih + dy).astype(int)
         if flip: box[:, [0,2]] = w - box[:, [2,0]]
         box[:, 0:2][box[:, 0:2]<0] = 0
         box[:, 2][box[:, 2]>w] = w
@@ -697,7 +697,7 @@ def get_training_batch(annotation_lines, anchors, num_classes, batch_size=32, h=
         if b==0:
             np.random.shuffle(annotation_lines)
         
-        image, box = augment_data(annotation_lines[b], (h, w), random=random, max_boxes=200, jitter=0, hue=0, sat=1, val=1, proc_img=True)
+        image, box = augment_data(annotation_lines[b], (h, w), random=False, max_boxes=20, jitter=0, hue=0, sat=1, val=1, proc_img=True)
         image_data.append(image)
         box_data.append(box)
 

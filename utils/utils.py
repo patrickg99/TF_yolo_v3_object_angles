@@ -697,7 +697,7 @@ def get_training_batch(annotation_lines, anchors, num_classes, batch_size=32, h=
         if b==0:
             np.random.shuffle(annotation_lines)
         
-        image, box = augment_data(annotation_lines[b], (h, w), random=True, max_boxes=20, jitter=0, hue=0, sat=1, val=1, proc_img=True)
+        image, box = augment_data(annotation_lines[b], (h, w), random=False, max_boxes=20, jitter=0, hue=0, sat=1, val=1, proc_img=True)
         image_data.append(image)
         box_data.append(box)
 
