@@ -22,9 +22,9 @@ def _main():
         help="The path to where a previously trained model's weights are stored. To use the default\n\
         coco weights, use the path 'model_weights/coco_pretrained_weights.ckpt'. Otherwise, the model\n\
         weights will be initialized randomly. ")
-    parser.add_argument('--class_path', default='utils/coco_classes.txt', type=str,
+    parser.add_argument('--class_path', default='utils/defect_classes.txt', type=str,
         help='The path that points towards where the class names for the dataset are stored.\n\
-        The default path is "utils/coco_classes.txt".')
+        The default path is "utils/defect_classes.txt".')
     parser.add_argument(
         '--anchors_path',default='utils/anchors.txt', type=str,
         help='The path that points towards where the anchor values for the model are stored.\n\

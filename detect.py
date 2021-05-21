@@ -29,9 +29,9 @@ def _main():
         '--tensorboard_save_path', default='tensorboard/tensorboard_detect/',
         help="")
     parser.add_argument(
-        '--class_path', default='utils/coco_classes.txt', type=str,
+        '--class_path', default='utils/defect_classes.txt', type=str,
         help='The path that points towards where the class names for the dataset are stored.\n\
-        The default path is "utils/coco_classes.txt".')
+        The default path is "utils/defect_classes.txt".')
     parser.add_argument(
         '--anchors_path', default='utils/anchors.txt', type=str,
         help='The path that points towards where the anchor values for the model are stored.\n\
