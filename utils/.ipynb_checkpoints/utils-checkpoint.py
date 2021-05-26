@@ -127,8 +127,8 @@ def non_max_suppression(predictions_with_boxes, confidence_threshold, iou_thresh
         non_zero_idxs = np.nonzero(image_pred)
         image_pred = image_pred[non_zero_idxs]
         image_pred = image_pred.reshape(-1, shape[-1])
-        bbox_attrs = image_pred[:, :5]
-        classes = image_pred[:, 5:]
+        bbox_attrs = image_pred[:, :6]
+        classes = image_pred[:, 6:]
         classes = np.argmax(classes, axis=-1)
     
         unique_classes = list(set(classes.reshape(-1)))
@@ -138,7 +138,7 @@ def non_max_suppression(predictions_with_boxes, confidence_threshold, iou_thresh
             cls_boxes = bbox_attrs[np.nonzero(cls_mask)]
             cls_boxes = cls_boxes[cls_boxes[:, -1].argsort()[::-1]]
             cls_scores = cls_boxes[:, -1]
-            cls_boxes = cls_boxes[:, :-1]
+            cls_boxes = cls_boxes[:, :-2]
 
             while len(cls_boxes) > 0:
                 box = cls_boxes[0]
