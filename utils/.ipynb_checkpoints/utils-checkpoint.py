@@ -329,8 +329,6 @@ def prepare_data(annotations_path, training_validation_split=0.9, batch_size=32,
         train_batch_size = min(len(training_data), batch_size)
         val_batch_size = min(len(validation_data), batch_size)
         batch_size = min(train_batch_size, val_batch_size)
-        training_data = training_data[:batch_size]
-        validation_data = validation_data[:batch_size]
     
     return training_data, validation_data, batch_size
 

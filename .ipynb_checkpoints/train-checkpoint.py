@@ -123,7 +123,7 @@ def _main():
     # returns a varlist containing only the vars of the conv layers right before the yolo layers
     trainable_var_list = tf.trainable_variables()
     last_layer_var_list = [i for i in trainable_var_list if i.shape[-1] == (6+num_classes)*num_anchors_per_detector] 
-    train_op_with_frozen_variables = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss, global_step=global_step, var_list=last_layer_var_list)
+    a_with_frozen_variables = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss, global_step=global_step, var_list=last_layer_var_list)
     train_op_with_all_variables = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss, global_step=global_step, var_list=trainable_var_list)
     summ = tf.summary.merge_all()
 
@@ -158,6 +158,7 @@ def _main():
                 sess.run(train_op_with_frozen_variables, feed_dict={X: input_images, y_true_data: y_true, y_true_box_data: y_true_boxes})
             else:
                 sess.run(train_op_with_all_variables, feed_dict={X: input_images, y_true_data: y_true, y_true_box_data: y_true_boxes})
+            
         
             if i % args['log_every_x_iterations'] == 0:
                 # write the training loss to tensorboard
