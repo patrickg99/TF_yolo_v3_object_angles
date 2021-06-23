@@ -22,7 +22,7 @@ def _main():
         help="The path to where a previously trained model's weights are stored. To use the default\n\
         coco weights, use the path 'model_weights/coco_pretrained_weights.ckpt'. Otherwise, the model\n\
         weights will be initialized randomly. ")
-    parser.add_argument('--class_path', default='utils/defect_classes.txt', type=str,
+    parser.add_argument('--class_path', default='utils/coco_classes.txt', type=str,
         help='The path that points towards where the class names for the dataset are stored.\n\
         The default path is "utils/defect_classes.txt".')
     parser.add_argument(
@@ -123,7 +123,7 @@ def _main():
     # returns a varlist containing only the vars of the conv layers right before the yolo layers
     trainable_var_list = tf.trainable_variables()
     last_layer_var_list = [i for i in trainable_var_list if i.shape[-1] == (6+num_classes)*num_anchors_per_detector] 
-    a_with_frozen_variables = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss, global_step=global_step, var_list=last_layer_var_list)
+    train_op_with_frozen_variables = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss, global_step=global_step, var_list=last_layer_var_list)
     train_op_with_all_variables = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss, global_step=global_step, var_list=trainable_var_list)
     summ = tf.summary.merge_all()
 
@@ -157,8 +157,7 @@ def _main():
             if i < num_iterations//3:
                 sess.run(train_op_with_frozen_variables, feed_dict={X: input_images, y_true_data: y_true, y_true_box_data: y_true_boxes})
             else:
-                sess.run(train_op_with_all_variables, feed_dict={X: input_images, y_true_data: y_true, y_true_box_data: y_true_boxes})
-            
+                sess.run(train_op_with_all_variables, feed_dict={X: input_images, y_true_data: y_true, y_true_box_data: y_true_boxes})            
         
             if i % args['log_every_x_iterations'] == 0:
                 # write the training loss to tensorboard

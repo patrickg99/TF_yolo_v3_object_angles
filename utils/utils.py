@@ -46,9 +46,9 @@ def draw_boxes(output_filename, classes_filename, inputs, original_image, resize
 
             textx0y0 = (x0y0[0],x0y0[1]-4)
 
-            cv2.rectangle(original_image, x0y0, x1y1, (255,255,255), 3)
+            cv2.rectangle(original_image, x0y0, x1y1, (255,255,255), 1)
             text_label = str(names[object_class])[:-1] + ", " + str(round(object_prob*100,2)) + "%"
-            cv2.putText(original_image, text_label, textx0y0, cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 3)
+            cv2.putText(original_image, text_label, textx0y0, cv2.FONT_HERSHEY_SIMPLEX, 0.33, (255,255,255), 1)
 
     cv2.imwrite(output_filename, cv2.cvtColor(original_image, cv2.COLOR_RGB2BGR))
 
